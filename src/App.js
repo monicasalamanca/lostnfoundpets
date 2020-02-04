@@ -1,15 +1,16 @@
 import React from 'react';
 //import logo from './logo.svg';
 import Header from './components/Header';
-import './App.css';
+import PetCard from './components/PetCard';
+import './App.scss';
 
 const authUrl = 'https://api.petfinder.com/v2/oauth2/token';
 
 class App extends React.Component {
 
-  // state = {
-  //   weather: []
-  // }
+  state = {
+    pets: []
+  }
 
   componentDidMount() {
     fetch(authUrl, {
@@ -21,8 +22,7 @@ class App extends React.Component {
     })
     .then(res => res.json())
     .then(json => {
-      console.log('json', json);
-      const url = 'https://api.petfinder.com/v2/animals?type=dog&page=2';
+      const url = 'https://api.petfinder.com/v2/animals?type=dog&page=3';
       const options = {
         headers: {
           Authorization: `Bearer ${json.access_token}`
@@ -32,16 +32,27 @@ class App extends React.Component {
       if (json) {
         fetch(url, options)
           .then(resp => resp.json())
-          .then(dataJson => {
-            console.log(dataJson);
+          .then(data => {
+            // console.log('animals', data.animals);
+            this.setState({ pets: data.animals });
           })
       }
-    })
+    });
+
   }
 
   render () {
     return (
-      <Header />
+      <>
+        <Header />
+        <div className="pets-list">
+        { 
+          Object.keys(this.state.pets).map(key => (
+            <PetCard key={key} index={key} pet={this.state.pets[key]} />
+          ))
+        }
+        </div>
+      </>
     )
   }
 }
